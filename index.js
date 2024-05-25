@@ -55,7 +55,7 @@ async function run() {
             const email = req.params.email;
             const cursor = await BookedEventCollection.find({ currentUserEmail: email });
             const events = await cursor.toArray();
-            res.send(events)
+            res.send(events);
         })
 
 
