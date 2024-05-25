@@ -75,7 +75,7 @@ async function run() {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await EventCollection.findOne(query);
-            res.send(result)
+            res.send(result);
         })
 
         app.get('/events/byEmail/:email', async (req, res) => {
