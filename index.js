@@ -107,7 +107,7 @@ async function run() {
                 }
             }
             const result = await EventCollection.updateOne(query, event);
-            res.send(result);
+            res.send(result)
         })
 
         app.delete('/events/delete/:id', async (req, res) => {
