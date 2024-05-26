@@ -44,6 +44,22 @@ async function run() {
             res.send(result);
         })
 
+        app.patch('/bookedEvents/status/:id', async (req, res) => {
+            const id = req.params.id;
+            const status = req.body.status
+            const query = {
+                _id: new ObjectId(id)
+            }
+            const option = {
+                $set : {
+                    status: status
+                }
+            }
+            console.log(id, status, option, query);
+            const result = await BookedEventCollection.updateOne(query, option);
+            res.send(result);
+        })
+
         app.get('/bookedEvents/byId/:id', async (req, res) => {
             const id = req.params.id;
             const cursor = await BookedEventCollection.find({ id: id });
@@ -58,6 +74,12 @@ async function run() {
             res.send(events);
         })
 
+        app.get('/bookedEvents/ToDo/:email', async (req, res) => {
+            const email = req.params.email;
+            const cursor = await BookedEventCollection.find({ email: email });
+            const events = await cursor.toArray();
+            res.send(events);
+        })
 
         app.get('/bookedEvents', async (req, res) => {
             const cursor = await BookedEventCollection.find();
@@ -65,8 +87,17 @@ async function run() {
             res.send(events);
         })
 
+        // app.get('/events', async (req, res) => {
+        //     const cursor = await EventCollection.find();
+        //     const events = await cursor.toArray();
+        //     res.send(events);
+        // })
+
         app.get('/events', async (req, res) => {
-            const cursor = await EventCollection.find();
+            const size = parseInt(req.query.size);
+            const page = parseInt(req.query.page);  
+            // console.log(page, size); 
+            const cursor = await EventCollection.find().skip(size*page).limit(size);
             const events = await cursor.toArray();
             res.send(events);
         })
@@ -91,6 +122,11 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const result = await EventCollection.findOne(query);
             res.send(result);
+        })
+
+        app.get('/events/byCount/eventsCount', async (req, res) => {
+            const count = await EventCollection.estimatedDocumentCount()
+            res.send({count});
         })
 
         app.put('/events/update/:id', async (req, res) => {
