@@ -5,7 +5,16 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const port = process.env.PORT || 5000
 
-app.use(cors());
+app.use(
+    cors({
+      origin: [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "https://eventx-7378e.web.app",
+      ],
+      credentials: true,
+    })
+  );
 app.use(express.json())
 
 
@@ -29,7 +38,7 @@ async function run() {
 
 
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
         // Send a ping to confirm a successful connection
 
         app.post('/events', async (req, res) => {
