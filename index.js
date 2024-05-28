@@ -51,7 +51,7 @@ async function run() {
                 _id: new ObjectId(id)
             }
             const option = {
-                $set : {
+                $set: {
                     status: status
                 }
             }
@@ -93,14 +93,6 @@ async function run() {
         //     res.send(events);
         // })
 
-        app.get('/events', async (req, res) => {
-            const size = parseInt(req.query.size);
-            const page = parseInt(req.query.page);  
-            // console.log(page, size); 
-            const cursor = await EventCollection.find().skip(size*page).limit(size);
-            const events = await cursor.toArray();
-            res.send(events);
-        })
 
         app.get('/events/:id', async (req, res) => {
             const id = req.params.id;
@@ -126,7 +118,7 @@ async function run() {
 
         app.get('/events/byCount/eventsCount', async (req, res) => {
             const count = await EventCollection.estimatedDocumentCount()
-            res.send({count});
+            res.send({ count });
         })
 
         app.put('/events/update/:id', async (req, res) => {
@@ -153,8 +145,42 @@ async function run() {
             res.send(result);
         })
 
+        
+        app.get('/events', async (req, res) => {
+            const size = parseInt(req.query.size) || 10; // Default to 10 if not provided
+            const page = parseInt(req.query.page) || 0; // Default to 0 if not provided
+        
+            try {
+                const cursor = await EventCollection.find().skip(size * page).limit(size);
+                const events = await cursor.toArray();
+                res.send(events);
+            } catch (error) {
+                console.error('Error retrieving events:', error);
+                res.status(500).send({ error: 'An error occurred while fetching events' });
+            }
+        });
+        
 
-
+        app.get('/events/search/event', async (req, res) => {
+            const search = req.query.search;
+        
+            if (!search) {
+                return res.status(400).send({ error: 'Search query is required' });
+            }
+        
+            console.log(`Search query: ${search}`);
+        
+            const query = { name: { $regex: search, $options: 'i' } };
+        
+            try {
+                const result = await EventCollection.find(query).toArray();
+                res.send(result);
+            } catch (error) {
+                console.error('Error retrieving events:', error);
+                res.status(500).send({ error: 'An error occurred while searching for events' });
+            }
+        });
+        
 
 
 
